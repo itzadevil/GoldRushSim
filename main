@@ -1,0 +1,383 @@
+import random
+import time
+from typing import Dict, List
+
+class GoldRushGame:
+    def __init__(self):
+        self.money = 250  # Starting money in dollars
+        self.gold = 0     # Gold in ounces
+        self.day = 1
+        self.health = 100
+        self.supplies = 100
+        self.location = "Independence, Missouri"
+        self.equipment = {
+            "pan": False,
+            "shovel": False,
+            "pickaxe": False,
+            "dynamite": False
+        }
+        
+    def clear_screen(self):
+        print("\n" * 50)
+        
+    def show_status(self):
+        print("\n" + "="*50)
+        print(f"Day: {self.day}/365   Location: {self.location}")
+        print(f"Money: ${self.money}   Gold: {self.gold} oz")
+        print(f"Health: {self.health}%   Supplies: {self.supplies}%")
+        print("Equipment:", ", ".join(item for item, has in self.equipment.items() if has))
+        print("="*50 + "\n")
+
+    def explain_mining_methods(self):
+        print("\nMINING METHODS GUIDE:")
+        print("\n1. PANNING FOR GOLD")
+        print("   A simple but effective method where miners use a pan to wash")
+        print("   river sediment, separating heavier gold particles from lighter")
+        print("   sand and gravel. Gold, being much denser than other materials,")
+        print("   settles at the bottom of the pan while lighter materials wash away.")
+        print("   - Easiest method to learn")
+        print("   - Lowest physical toll")
+        print("   - Small but consistent yields")
+        print("   - Best for beginners")
+        
+        print("\n2. PLACER MINING")
+        print("   A more advanced method that involves digging up loose sediment")
+        print("   (placer deposits) from riverbanks and beds where gold has naturally")
+        print("   concentrated over time. This method requires more effort but can")
+        print("   yield more gold than panning.")
+        print("   - Moderate difficulty")
+        print("   - Requires physical stamina")
+        print("   - Better yields than panning")
+        print("   - Good for intermediate miners")
+        
+        print("\n3. HARD ROCK MINING")
+        print("   The most challenging method involving extracting gold directly")
+        print("   from solid rock. Gold in hard rock mines usually appears in")
+        print("   veins within quartz deposits. This method offers the highest")
+        print("   potential rewards but also carries the greatest risks.")
+        print("   - Most difficult method")
+        print("   - Highest physical toll")
+        print("   - Highest potential yields")
+        print("   - Best for experienced miners")
+        print("   - Can be improved with dynamite\n")
+        
+        input("Press Enter to continue...")
+
+    def store(self):
+        prices = {
+            "pan": 20,
+            "shovel": 50,
+            "pickaxe": 100,
+            "dynamite": 150,
+            "supplies": 50,
+            "bandages": 15,
+            "medicine": 30,
+            "doctor": 100
+        }
+        
+        healing = {
+            "bandages": 20,    # Heals 20 health
+            "medicine": 50,    # Heals 50 health
+            "doctor": 100      # Fully heals
+        }
+        
+        while True:
+            self.clear_screen()
+            self.show_status()
+            print("\nWelcome to the General Store!")
+            print("\nEquipment:")
+            print(f"1. Gold Pan: ${prices['pan']} (Required for panning)")
+            print(f"2. Shovel: ${prices['shovel']} (Required for placer mining)")
+            print(f"3. Pickaxe: ${prices['pickaxe']} (Required for hard rock mining)")
+            print(f"4. Dynamite: ${prices['dynamite']} (Improves hard rock mining)")
+            print(f"\nSupplies and Healing:")
+            print(f"5. Supplies: ${prices['supplies']} (Restores 50% supplies)")
+            print(f"6. Bandages: ${prices['bandages']} (Heals {healing['bandages']} health)")
+            print(f"7. Medicine: ${prices['medicine']} (Heals {healing['medicine']} health)")
+            print(f"8. Doctor Visit: ${prices['doctor']} (Restores full health)")
+            print("9. Exit store")
+            
+            choice = input("\nWhat would you like to buy? ")
+            
+            if choice == "1" and self.money >= prices['pan']:
+                self.money -= prices['pan']
+                self.equipment['pan'] = True
+                print("\nYou bought a gold pan!")
+            elif choice == "2" and self.money >= prices['shovel']:
+                self.money -= prices['shovel']
+                self.equipment['shovel'] = True
+                print("\nYou bought a shovel!")
+            elif choice == "3" and self.money >= prices['pickaxe']:
+                self.money -= prices['pickaxe']
+                self.equipment['pickaxe'] = True
+                print("\nYou bought a pickaxe!")
+            elif choice == "4" and self.money >= prices['dynamite']:
+                self.money -= prices['dynamite']
+                self.equipment['dynamite'] = True
+                print("\nYou bought dynamite!")
+            elif choice == "5" and self.money >= prices['supplies']:
+                self.money -= prices['supplies']
+                self.supplies = min(100, self.supplies + 50)
+                print("\nYou bought supplies!")
+            elif choice == "6" and self.money >= prices['bandages']:
+                if self.health >= 100:
+                    print("\nYou are already at full health!")
+                else:
+                    self.money -= prices['bandages']
+                    self.health = min(100, self.health + healing['bandages'])
+                    print(f"\nYou used bandages and healed {healing['bandages']} health!")
+            elif choice == "7" and self.money >= prices['medicine']:
+                if self.health >= 100:
+                    print("\nYou are already at full health!")
+                else:
+                    self.money -= prices['medicine']
+                    self.health = min(100, self.health + healing['medicine'])
+                    print(f"\nYou took medicine and healed {healing['medicine']} health!")
+            elif choice == "8" and self.money >= prices['doctor']:
+                if self.health >= 100:
+                    print("\nYou are already at full health!")
+                else:
+                    self.money -= prices['doctor']
+                    old_health = self.health
+                    self.health = 100
+                    print(f"\nThe doctor treated you and restored {100 - old_health} health!")
+            elif choice == "9":
+                break
+            else:
+                print("\nYou can't afford that or made an invalid choice!")
+            
+            input("\nPress Enter to continue...")
+
+    def travel(self):
+        routes = {
+            "Independence, Missouri": ["California"],
+            "California": ["Gold Fields"]
+        }
+        
+        route_info = {
+            "California": {
+                "options": ["Panama Route", "Cape Horn Route", "Overland Route"],
+                "Panama Route": {
+                    "speed": "FASTEST (3-4 months)",
+                    "danger": "MEDIUM DANGER",
+                    "hazards": ["Malaria", "Shipwreck", "Bandits"],
+                    "days": (90, 120)
+                },
+                "Cape Horn Route": {
+                    "speed": "SLOWEST (6-8 months)",
+                    "danger": "LOW DANGER",
+                    "hazards": ["Storm", "Scurvy", "Shipwreck"],
+                    "days": (180, 240)
+                },
+                "Overland Route": {
+                    "speed": "FAST (4-5 months)",
+                    "danger": "HIGH DANGER",
+                    "hazards": ["Dysentery", "Broken Wagon", "Native American Conflict"],
+                    "days": (120, 150)
+                }
+            }
+        }
+        
+        if self.location == "Independence, Missouri":
+            print("\nAvailable routes to California:")
+            options = route_info["California"]["options"]
+            for i, route in enumerate(options, 1):
+                info = route_info["California"][route]
+                print(f"{i}. {route}")
+                print(f"   Speed: {info['speed']}")
+                print(f"   Risk Level: {info['danger']}")
+                print(f"   Possible Hazards: {', '.join(info['hazards'])}")
+                print()
+            
+            choice = input("\nWhich route would you like to take? ")
+            try:
+                route_chosen = options[int(choice)-1]
+                route_data = route_info["California"][route_chosen]
+                
+                hazard = random.choice(route_data["hazards"])
+                damage = random.randint(10, 30)
+                self.health -= damage
+                self.supplies -= damage
+                print(f"\nOh no! You encountered {hazard}!")
+                print(f"You lost {damage} health and supplies!")
+                
+                min_days, max_days = route_data["days"]
+                travel_days = random.randint(min_days, max_days)
+                self.day += travel_days
+                print(f"\nYour journey took {travel_days} days.")
+                
+                self.location = "California"
+                print("\nYou have arrived in California!")
+            except:
+                print("\nInvalid choice!")
+        
+        elif self.location == "California":
+            print("\nTraveling to the Gold Fields...")
+            self.day += random.randint(1, 5)
+            self.location = "Gold Fields"
+            print("\nYou have arrived at the Gold Fields!")
+
+    def pan_for_gold(self):
+        if not self.equipment['pan']:
+            print("\nYou need a gold pan to pan for gold!")
+            return
+            
+        print("\nPanning for gold in the river...")
+        print("You carefully swirl the pan in the water, watching for the glint of gold...")
+        time.sleep(2)
+        
+        success = random.random()
+        if success < 0.6:  # 60% chance of finding gold
+            gold_found = round(random.uniform(0.1, 0.5), 2)
+            self.gold += gold_found
+            print(f"You found {gold_found} ounces of gold!")
+        else:
+            print("No luck this time... The sun is setting, but tomorrow brings new opportunities.")
+        
+        self.supplies -= 5
+        self.health -= 5
+        self.day += 1
+
+    def placer_mine(self):
+        if not self.equipment['shovel']:
+            print("\nYou need a shovel to do placer mining!")
+            return
+            
+        print("\nDigging in the riverbed for gold deposits...")
+        print("You dig deep into the ancient riverbed, searching for gold-rich layers...")
+        time.sleep(2)
+        
+        success = random.random()
+        if success < 0.4:  # 40% chance of finding gold
+            gold_found = round(random.uniform(0.5, 2.0), 2)
+            self.gold += gold_found
+            print(f"You found {gold_found} ounces of gold!")
+        else:
+            print("No luck today... The riverbed holds its secrets for another day.")
+        
+        self.supplies -= 10
+        self.health -= 10
+        self.day += 1
+
+    def hard_rock_mine(self):
+        if not self.equipment['pickaxe']:
+            print("\nYou need a pickaxe to do hard rock mining!")
+            return
+            
+        print("\nMining the quartz veins for gold...")
+        print("You strike at the quartz vein, following the glittering trail of gold...")
+        time.sleep(2)
+        
+        success = random.random()
+        success_modifier = 0.2 if not self.equipment['dynamite'] else 0.4
+        if success < success_modifier:  # 20% chance (40% with dynamite)
+            gold_found = round(random.uniform(2.0, 5.0), 2)
+            self.gold += gold_found
+            print(f"You found {gold_found} ounces of gold!")
+        else:
+            print("The rock stands firm today... Perhaps tomorrow's blast will reveal its treasures.")
+        
+        self.supplies -= 15
+        self.health -= 15
+        self.day += 1
+
+    def sell_gold(self):
+        if self.gold == 0:
+            print("\nYou don't have any gold to sell!")
+            return
+            
+        price_per_ounce = random.randint(20, 30)
+        earnings = round(self.gold * price_per_ounce, 2)
+        self.money += earnings
+        print(f"\nSold {self.gold} ounces of gold for ${earnings}!")
+        self.gold = 0
+
+    def check_game_over(self):
+        if self.health <= 0:
+            print("\nGame Over! You died!")
+            return True
+        if self.supplies <= 0:
+            print("\nGame Over! You ran out of supplies!")
+            return True
+        if self.day > 365:
+            if self.money >= 500:
+                print(f"\nCongratulations! You've won! You finished with ${self.money}!")
+            else:
+                print(f"\nGame Over! You didn't reach $500 within 365 days. Final money: ${self.money}")
+            return True
+        return False
+
+    def play(self):
+        while True:
+            if self.check_game_over():
+                break
+                
+            self.clear_screen()
+            self.show_status()
+            
+            if self.location == "Gold Fields":
+                print("\nWhat would you like to do?")
+                print("1. Pan for gold")
+                print("2. Placer mine")
+                print("3. Hard rock mine")
+                print("4. Sell gold")
+                print("5. Visit store")
+                print("6. Learn about mining methods")
+                print("7. Quit")
+                
+                choice = input("\nEnter your choice: ")
+                
+                if choice == "1":
+                    self.pan_for_gold()
+                elif choice == "2":
+                    self.placer_mine()
+                elif choice == "3":
+                    self.hard_rock_mine()
+                elif choice == "4":
+                    self.sell_gold()
+                elif choice == "5":
+                    self.store()
+                elif choice == "6":
+                    self.explain_mining_methods()
+                elif choice == "7":
+                    break
+            else:
+                print("\nWhat would you like to do?")
+                print("1. Travel")
+                print("2. Visit store")
+                print("3. Quit")
+                
+                choice = input("\nEnter your choice: ")
+                
+                if choice == "1":
+                    self.travel()
+                elif choice == "2":
+                    self.store()
+                elif choice == "3":
+                    break
+            
+            input("\nPress Enter to continue...")
+
+if __name__ == "__main__":
+    print("Welcome to the California Gold Rush Simulation!")
+    print("\nThe year is 1848, and gold has been discovered at Sutter's Mill!")
+    print("You're starting your journey in Independence, Missouri.")
+    print("Your goal is to earn $500 within 365 days!")
+    print("\nThe three routes to California are:")
+    print("1. Panama Route - FASTEST (3-4 months) - MEDIUM DANGER")
+    print("2. Cape Horn Route - SLOWEST (6-8 months) - LOW DANGER")
+    print("3. Overland Route - FAST (4-5 months) - HIGH DANGER")
+    print("\nTips:")
+    print("- Buy supplies and equipment at the store")
+    print("- Remember to heal when your health gets low")
+    print("- Choose your route to California carefully")
+    print("- Different mining methods have different risks and rewards")
+    print("- Keep an eye on your health and supplies")
+    print("- Learn about mining methods to make informed choices")
+    print("- Remember, you need $500 within 365 days to win!")
+    print("\nGood luck!")
+    
+    input("\nPress Enter to begin your adventure...")
+    
+    game = GoldRushGame()
+    game.play()
